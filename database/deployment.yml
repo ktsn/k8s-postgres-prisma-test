@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: database
+  namespace: prisma
+  labels:
+    stage: production
+    name: database
+    app: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        stage: production
+        name: database
+        app: mysql
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          value: prisma
+        - name: POSTGRES_USER
+          value: prisma
+        image: postgres:10
+        name: postgres
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: database-disk
+        ports:
+          - name: postgres-5432
+            containerPort: 5432
+      restartPolicy: Always
+      volumes:
+      - name: database-disk
+        persistentVolumeClaim:
+          claimName: database-disk
+status: {}
